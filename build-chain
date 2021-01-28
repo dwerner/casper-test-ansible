@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+
+rm -rf artifacts/aws-chain-1
+./casper-tool.py -b ../casper-node create-network -k aws-hosts.yaml artifacts/aws-chain-1
+

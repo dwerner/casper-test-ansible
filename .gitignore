@@ -1,3 +1,5 @@
-tc.key
+*.key
 *.ovpn
 artifacts/
+.idea
+*-hosts.yaml

@@ -1,8 +1,0 @@
-- hosts: known_nodes
-  tasks:
-      - copy:
-          src: "{{ chain_path }}/chain/"
-          dest: /opt/casper-node/chain/
-      - copy:
-          src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/"
-          dest: /opt/casper-node/config/

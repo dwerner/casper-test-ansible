@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+pushd ../casper-node
+cargo build --release --package casper-node
+cargo build --release --package casper-client
+popd
+
+pushd ../casper-node-launcher
+cargo build --release
+popd
+

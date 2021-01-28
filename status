@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+
+set -x
+
+./describe-aws-instances | xargs printf "http://%s8888/status\n" | xargs curl | jq

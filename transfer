@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+CHAIN_NAME=$1
+NODE_ADDRESS=$2
+SRC_KEY=$3
+DST_KEY=$4
+
+../casper-node/target/release/casper-client transfer \
+            --chain-name "$CHAIN_NAME" \
+            --gas-price 1 \
+            --node-address "$NODE_ADDRESS" \
+            --payment-amount 10 \
+            --ttl "1day" \
+            --secret-key "$SRC_KEY" \
+            --amount 10 \
+            --target-account "$DST_KEY" \
+            | jq '.result.deploy_hash'

@@ -1,0 +1,17 @@
+[Unit]
+Description=Casper Node Launcher
+Documentation=https://docs.casperlabs.io
+After=network-online.target
+
+[Service]
+Type=simple
+Environment="CL_MEM_DUMP_THRESHOLD=3000"
+ExecStart=/var/lib/casper/bin/casper-node-launcher
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=casper-node-launcher
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

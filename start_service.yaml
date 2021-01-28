@@ -1,0 +1,8 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - service:
+          name: casper-node.service
+          enabled: yes
+          state: started

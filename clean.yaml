@@ -1,0 +1,20 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - service:
+          name: casper-node.service
+          enabled: yes
+          state: stopped
+      - file:
+          state: absent
+          path: /home/ubuntu/casper-node/
+      - file:
+          state: absent
+          path: /var/lib/casper/
+      - file:
+          state: absent
+          path: /etc/casper/
+      - file:
+          state: absent
+          path: "/storage/{{ inventory_hostname }}/"

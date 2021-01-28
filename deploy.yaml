@@ -1,0 +1,17 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - copy:
+          src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/var/lib/casper/bin"
+          dest: /var/lib/casper
+          mode: '777'
+      - copy:
+          src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/etc/casper"
+          dest: /etc/
+          group: ubuntu
+      - copy:
+          src: "templates/casper-node.service"
+          dest: /etc/systemd/system/casper-node.service
+      - systemd:
+          daemon_reload: true
