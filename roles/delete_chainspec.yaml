@@ -1,0 +1,8 @@
+- hosts: known_nodes
+  tasks:
+      - file:
+          state: absent
+          path: /opt/casper-node/config/
+      - file:
+          state: absent
+          path: /opt/casper-node/chain/
