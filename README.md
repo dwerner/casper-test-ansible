@@ -9,6 +9,11 @@ TODO:
 - create template for security group and instances
 - document helper scripts
 
+To disable ansible host key checking, set: 
+
+```bash
+export ANSIBLE_HOST_KEY_CHECKING=False
+```
 
 ```
 ./build-binaries
@@ -21,3 +26,4 @@ TODO:
 ./stop-service bootstrap
 ./clean bootstrap
 ```
+

@@ -6,15 +6,22 @@
           name: casper-node.service
           enabled: yes
           state: stopped
+
       - file:
           state: absent
           path: /home/ubuntu/casper-node/
+
       - file:
           state: absent
           path: /var/lib/casper/
+
       - file:
           state: absent
           path: /etc/casper/
+
       - file:
           state: absent
           path: "/storage/{{ inventory_hostname }}/"
+
+      - shell: "/bin/rm -f /var/log/syslog.*"
+      - shell: "> /var/log/syslog"
