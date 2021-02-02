@@ -1,9 +1,19 @@
 AWS Cluster Ansible scripts
 
+- To register with stests:
+```bash
+cd stests
+
+stests-register-dw <this_dir>/artifacts/<chain_name>/nodes
+
+```
+
 Dependencies:
 
 - aws-cli
 - ansible
+- ../casper-node (checkout of casper-node)
+- ../casper-node-launcher (checkout of casper-node-launcher)
 
 TODO:
 - create template for security group and instances
