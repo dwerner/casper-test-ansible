@@ -5,8 +5,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-Environment="CL_MEM_DUMP_THRESHOLD_MB=3000"
-ExecStart=/var/lib/casper/bin/casper-node-launcher
+Environment="CL_MEM_DUMP_THRESHOLD_MB=6000"
+ExecStart=/usr/bin/valgrind /var/lib/casper/bin/1_0_0/casper-node validator /etc/casper/1_0_0/config.toml
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=casper-node-launcher

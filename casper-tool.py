@@ -11,6 +11,8 @@ import yaml
 from pathlib import Path
 from itertools import chain
 
+# known_addresses doesn't need the port appended if using the small_network...
+USE_SMALL_NETWORK = True
 
 #: The port the node is reachable on.
 NODE_PORT = 34553
@@ -215,8 +217,9 @@ def create_network(
     for public_address in validator_nodes:
         key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
+        known_addresses = ["{}:{}".format(n, NODE_PORT) for n in bootstrap_nodes + validator_nodes]
         generate_node(
-            ["{}:{}".format(n, NODE_PORT) for n in validator_nodes if n != public_address],
+            known_addresses,
             obj, nodes_path, node_version, public_address)
         validator_keys.append(account)
 
@@ -284,7 +287,10 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     config["logging"]["format"] = "text"
     config["network"]["public_address"] = "{}:{}".format(public_address, NODE_PORT)
     config["network"]["bind_address"] = "0.0.0.0:{}".format(NODE_PORT)
-    config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]
+    if USE_SMALL_NETWORK:
+        config["network"]["known_addresses"] = known_addresses
+    else:
+        config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path
@@ -310,38 +316,6 @@ def create_chainspec(template, network_name, genesis_in):
     chainspec["genesis"]["timestamp"] = genesis_timestamp
     chainspec["genesis"]["accounts_path"] = "accounts.csv"
     return chainspec
-
-
-def create_node(
-    public_address, client_argv0, config_template, node_path, validators
-):
-    """Create a node configuration inside a network.
-    Paths are assumed to be set up using `create_chainspec`.
-    Returns the nodes public key as a string."""
-    # Generate a key
-    key_path = os.path.join(node_path, "keys")
-    run_client(client_argv0, "keygen", key_path)
-
-    config = toml.load(open(config_template))
-    config["node"]["chainspec_config_path"] = "chainspec.toml"
-    config["consensus"]["secret_key_path"] = os.path.join(
-        os.path.relpath(key_path, node_path), "secret_key.pem"
-    )
-    config["logging"]["format"] = "json"
-    # Set the public address to `casper-node-XX`, which will resolve to the internal
-    # network IP, and use the automatic port detection by setting `:0`.
-    config["network"]["public_address"] = "{}:{}".format(public_address, NODE_PORT)
-    config["network"]["bind_address"] = "0.0.0.0:{}".format(NODE_PORT)
-    config["network"]["known_addresses"] = [
-        "{}:{}".format(n, NODE_PORT)
-        for n in validators
-    ]
-    # Setup for volume operation.
-    storage_path = "/storage/{}".format(public_address)
-    config["storage"]["path"] = storage_path
-    config["consensus"]["unit_hashes_folder"] = storage_path
-    toml.dump(config, open(os.path.join(node_path, "config.toml", ), "w"))
-    return open(os.path.join(key_path, "public_key_hex")).read().strip()
 
 
 def create_accounts_csv(output_file, faucet, validators, zero_weight_ops):

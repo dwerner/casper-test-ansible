@@ -1,4 +1,5 @@
 #!/bin/bash
+export ANSIBLE_SSH_PIPELINING=True
 
 ansible-playbook -u ubuntu -i aws-hosts.yaml --forks 20 -e "{\"deploy_hosts\": \"$1\" }" clean.yaml
 

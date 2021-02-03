@@ -35,5 +35,7 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 ./stop-service bootstrap
 ./clean bootstrap
+
+ansible -u ubuntu --become  -i aws-hosts.yaml "bootstrap, validators" -a 'bash -c "systemctl status casper-node-heaptracked.service | grep Memory"'
 ```
 

@@ -5,8 +5,9 @@ After=network-online.target
 
 [Service]
 Type=simple
-Environment="CL_MEM_DUMP_THRESHOLD_MB=3000"
-ExecStart=/var/lib/casper/bin/casper-node-launcher
+Environment="CASPER_ENABLE_LEGACY_NET=1"
+# Environment=""
+ExecStart=/usr/bin/heaptrack /var/lib/casper/bin/1_0_0/casper-node validator /etc/casper/1_0_0/config.toml
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=casper-node-launcher

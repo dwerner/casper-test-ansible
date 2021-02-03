@@ -1,8 +1,23 @@
 - hosts: "{{ deploy_hosts }}"
   user: ubuntu
   become: true
+  gather_facts: no
   tasks:
-      - service:
+
+      - name: Stopping heaptracked casper-node-heaptracked.service
+        service:
+          name: casper-node-heaptracked.service
+          enabled: yes
+          state: stopped
+
+      - name: Stopping heaptracked casper-node-heaptracked.service
+        service:
+          name: casper-node-valgrind.service
+          enabled: yes
+          state: stopped
+
+      - name: Stopping casper-node.service
+        service:
           name: casper-node.service
           enabled: yes
           state: stopped

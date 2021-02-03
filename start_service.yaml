@@ -4,6 +4,6 @@
   gather_facts: no
   tasks:
       - service:
-          name: casper-node.service
+          name: "{{ service_name }}"
           enabled: yes
           state: started

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export ANSIBLE_SSH_PIPELINING=True
+
 ansible-playbook -u ubuntu -i aws-hosts.yaml --forks 20 \
-    -e "{\"chain_path\":\"artifacts/aws-chain-1\", \"deploy_hosts\": \"$1\" }" start_service.yaml
+    -e "{\"chain_path\":\"artifacts/aws-chain-1\", \"deploy_hosts\": \"$1\", \"service_name\": \"casper-node.service\"}" start_service.yaml
 

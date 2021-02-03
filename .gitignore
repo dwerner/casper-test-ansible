@@ -3,3 +3,4 @@
 artifacts/
 .idea
 *-hosts.yaml
+profiling_data*/*

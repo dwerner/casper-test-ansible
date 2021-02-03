@@ -1,5 +1,6 @@
 #!/bin/bash
 
-ansible-playbook -u ubuntu -i aws-hosts.yaml \
+export ANSIBLE_SSH_RETRIES=10
+ansible-playbook -u ubuntu -i aws-hosts.yaml --forks 25 \
     -e "{\"chain_path\":\"artifacts/aws-chain-1\", \"deploy_hosts\": \"$1\" }" stop_service.yaml
 

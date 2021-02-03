@@ -11,3 +11,7 @@
           name: gdb
           state: latest
           update_cache: yes
+      - apt:
+          name: valgrind
+          state: latest
+          update_cache: yes
