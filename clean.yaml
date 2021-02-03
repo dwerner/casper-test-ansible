@@ -1,6 +1,7 @@
 - hosts: "{{ deploy_hosts }}"
   user: ubuntu
   become: true
+  gather_facts: no
   tasks:
       - name: Stopping casper-node.service
         service:

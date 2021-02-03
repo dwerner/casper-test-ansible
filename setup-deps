@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ansible-playbook -u ubuntu -i aws-hosts.yaml -e "{\"deploy_hosts\": \"$1\" }" setup_heaptrack.yaml
-

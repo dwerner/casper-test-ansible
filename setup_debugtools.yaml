@@ -1,8 +1,13 @@
 - hosts: "{{ deploy_hosts }}"
   user: ubuntu
   become: true
+  gather_facts: no
   tasks:
       - apt:
           name: heaptrack
+          state: latest
+          update_cache: yes
+      - apt:
+          name: gdb
           state: latest
           update_cache: yes
