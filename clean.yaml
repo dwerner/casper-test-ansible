@@ -2,26 +2,29 @@
   user: ubuntu
   become: true
   tasks:
-      - service:
+      - name: Stopping casper-node.service
+        service:
           name: casper-node.service
           enabled: yes
           state: stopped
 
-      - file:
-          state: absent
-          path: /home/ubuntu/casper-node/
-
-      - file:
+      - name: Removing /var/lib/casper
+        file:
           state: absent
           path: /var/lib/casper/
 
-      - file:
+      - name: Removing /etc/casper
+        file:
           state: absent
           path: /etc/casper/
 
-      - file:
+      - name: "removing /storage/{{ inventory_hostname }}/"
+        file:
           state: absent
           path: "/storage/{{ inventory_hostname }}/"
 
-      - shell: "/bin/rm -f /var/log/syslog.*"
-      - shell: "> /var/log/syslog"
+      - name: Removing rotated syslogs
+        shell: "/bin/rm -f /var/log/syslog.*"
+
+      - name: Truncating syslog
+        shell: "> /var/log/syslog"

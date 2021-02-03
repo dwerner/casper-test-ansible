@@ -2,16 +2,20 @@
   user: ubuntu
   become: true
   tasks:
-      - copy:
+      - name: Deploy casper binaries
+        copy:
           src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/var/lib/casper/bin"
           dest: /var/lib/casper
           mode: '777'
-      - copy:
+      - name: Deploying chainspec and config
+        copy:
           src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/etc/casper"
           dest: /etc/
           group: ubuntu
-      - copy:
+      - name: Deploying casper-node.service file
+        copy:
           src: "templates/casper-node.service"
           dest: /etc/systemd/system/casper-node.service
-      - systemd:
+      - name: Reloading systemd
+        systemd:
           daemon_reload: true
