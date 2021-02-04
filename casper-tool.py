@@ -11,9 +11,6 @@ import yaml
 from pathlib import Path
 from itertools import chain
 
-# known_addresses doesn't need the port appended if using the small_network...
-USE_SMALL_NETWORK = True
-
 #: The port the node is reachable on.
 NODE_PORT = 34553
 
@@ -217,9 +214,8 @@ def create_network(
     for public_address in validator_nodes:
         key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
-        known_addresses = ["{}:{}".format(n, NODE_PORT) for n in bootstrap_nodes + validator_nodes]
         generate_node(
-            known_addresses,
+            bootstrap_nodes + validator_nodes,
             obj, nodes_path, node_version, public_address)
         validator_keys.append(account)
 
@@ -227,7 +223,7 @@ def create_network(
         key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
-            ["{}:{}".format(n, NODE_PORT) for n in bootstrap_nodes + validator_nodes],
+            bootstrap_nodes + validator_nodes,
             obj, nodes_path, node_version, public_address)
         zero_weight_keys.append(account)
 
@@ -287,10 +283,7 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     config["logging"]["format"] = "text"
     config["network"]["public_address"] = "{}:{}".format(public_address, NODE_PORT)
     config["network"]["bind_address"] = "0.0.0.0:{}".format(NODE_PORT)
-    if USE_SMALL_NETWORK:
-        config["network"]["known_addresses"] = known_addresses
-    else:
-        config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]
+    config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path

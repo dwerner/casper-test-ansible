@@ -1,0 +1,29 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  gather_facts: no
+  tasks:
+      - name: Deploying chainspec and config
+        copy:
+          src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/etc/casper"
+          dest: /etc/
+          group: ubuntu
+
+      - name: Deploying casper-node.service file
+        copy:
+          src: "templates/casper-node.service"
+          dest: /etc/systemd/system/casper-node.service
+
+      - name: Deploying casper-node-heaptracked.service file
+        copy:
+          src: "templates/casper-node-heaptracked.service"
+          dest: /etc/systemd/system/casper-node-heaptracked.service
+
+      - name: Deploying casper-node-valgrind.service file
+        copy:
+          src: "templates/casper-node-valgrind.service"
+          dest: /etc/systemd/system/casper-node-valgrind.service
+
+      - name: Reloading systemd
+        systemd:
+          daemon_reload: true
