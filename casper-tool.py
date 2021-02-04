@@ -304,10 +304,9 @@ def create_chainspec(template, network_name, genesis_in):
     genesis_timestamp = (datetime.utcnow() + timedelta(seconds=genesis_in)).isoformat(
         "T"
     ) + "Z"
-    show_val("Genesis", "{} (in {} seconds)".format(genesis_timestamp, genesis_in))
-    chainspec["genesis"]["name"] = network_name
-    chainspec["genesis"]["timestamp"] = genesis_timestamp
-    chainspec["genesis"]["accounts_path"] = "accounts.csv"
+    show_val("Core", "{} (in {} seconds)".format(genesis_timestamp, genesis_in))
+    chainspec["network"]["name"] = network_name
+    chainspec["network"]["timestamp"] = genesis_timestamp
     return chainspec
 
 
