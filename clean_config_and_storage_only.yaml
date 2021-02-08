@@ -5,7 +5,7 @@
   tasks:
       - name: Stopping casper-node.service
         service:
-          name: casper-node.service
+          name: casper-node-heaptracked.service
           enabled: yes
           state: stopped
 

@@ -1,0 +1,6 @@
+- tasks:
+      - name: set ec2 tag
+        ec2_instance_info:
+            region: us-west-2
+            filters:
+                "tag:Name": "danw-test-3"

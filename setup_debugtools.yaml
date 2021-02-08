@@ -4,14 +4,15 @@
   gather_facts: no
   tasks:
       - apt:
-          name: heaptrack
+          name:
+              - heaptrack
+              - gdb
+              - valgrind
+              - python3-pip
           state: latest
           update_cache: yes
-      - apt:
-          name: gdb
-          state: latest
-          update_cache: yes
-      - apt:
-          name: valgrind
-          state: latest
-          update_cache: yes
+      - pip:
+          name:
+              - boto3
+              - botocore
+

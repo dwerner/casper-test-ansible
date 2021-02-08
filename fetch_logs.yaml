@@ -1,0 +1,16 @@
+- hosts: "{{ fetch_hosts }}"
+  user: ubuntu
+  become: true
+  gather_facts: no
+
+  tasks:
+      - name: Archive syslog
+        archive:
+            path: "/var/log/syslog"
+            dest: "/var/log/syslog.bz2"
+            format: bz2
+
+      - name: Fetching syslog
+        fetch:
+            src: "/var/log/syslog.bz2"
+            dest: "logs/{{ inventory_hostname }}/"
