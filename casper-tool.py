@@ -191,7 +191,7 @@ def add_joiners(
         generate_node(validator_nodes + bootstrap_nodes, obj, nodes_path, node_version, public_address, trusted_hash)
         node_path = os.path.join(nodes_path, public_address)
 
-        show_val("coping files to ", node_path)
+        show_val("copying files to ", node_path)
 
         # copy the bin and chain into each node's versioned fileset
         node_var_lib_casper = os.path.join(node_path, "var", "lib", "casper")
