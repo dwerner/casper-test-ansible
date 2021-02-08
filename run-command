@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+ansible -u ubuntu --become  -i aws-hosts.yaml bootstrap -a 'bash -c "$1"'

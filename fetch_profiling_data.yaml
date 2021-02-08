@@ -1,0 +1,15 @@
+- hosts: "{{ fetch_hosts }}"
+  user: ubuntu
+  become: true
+  gather_facts: no
+
+  tasks:
+      - name: Get list of heaptrack files for download
+        shell: ls /heaptrack.*.gz
+        register: path_files
+
+      - name: Fetch heaptrack files to local machine ./profiling_data/
+        fetch:
+            src : "{{item}}"
+            dest: "profiling_data/"
+        with_items: "{{ path_files.stdout_lines }}"

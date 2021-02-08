@@ -1,0 +1,10 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - name: Deploying chainspec and config
+        copy:
+          src: "{{ chain_path }}/nodes/{{ inventory_hostname }}/etc/casper"
+          dest: /etc/
+          group: ubuntu
+

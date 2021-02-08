@@ -1,0 +1,18 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  gather_facts: no
+  tasks:
+      - apt:
+          name:
+              - heaptrack
+              - gdb
+              - valgrind
+              - python3-pip
+          state: latest
+          update_cache: yes
+      - pip:
+          name:
+              - boto3
+              - botocore
+

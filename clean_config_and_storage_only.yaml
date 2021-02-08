@@ -5,20 +5,9 @@
   tasks:
       - name: Stopping casper-node.service
         service:
-          name: casper-node.service
-          enabled: yes
-          state: stopped
-
-      - name: Stopping casper-node-heaptracked.service
-        service:
           name: casper-node-heaptracked.service
           enabled: yes
           state: stopped
-
-      - name: Removing /var/lib/casper
-        file:
-          state: absent
-          path: /var/lib/casper/
 
       - name: Removing /etc/casper
         file:
@@ -33,7 +22,7 @@
       - name: Truncating syslog
         shell: "> /var/log/casper-node.log"
 
-      - name: Get list of heaptrack files for download
+      - name: Get list of heaptrack files for removal
         shell: ls /heaptrack.*.gz
         register: path_files
 

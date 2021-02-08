@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 Environment="CASPER_ENABLE_LEGACY_NET=1"
-ExecStart=/var/lib/casper/bin/casper-node-launcher
+ExecStart=/bin/sh -c 'exec /usr/bin/valgrind /usr/bin/casper-node validator /etc/casper/1_0_0/config.toml 2>&1 /var/log/casper-node.log'
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=casper-node-launcher
@@ -15,4 +15,3 @@ Group=root
 
 [Install]
 WantedBy=multi-user.target
-

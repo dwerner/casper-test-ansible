@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ansible-playbook -u ubuntu -i aws-hosts.yaml \
+    -e "{\"chain_path\":\"artifacts/aws-chain-1\", \"deploy_hosts\": \"$1\", \"service_name\": \"casper-node-heaptracked.service\"}" start_service.yaml
+
