@@ -13,4 +13,4 @@
       - name: Fetching syslog
         fetch:
             src: "/var/log/casper-node.log.bz2"
-            dest: "logs/{{ inventory_hostname }}/"
+            dest: "logs/"

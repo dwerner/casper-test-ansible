@@ -11,5 +11,5 @@
       - name: Fetch heaptrack files to local machine ./profiling_data/
         fetch:
             src : "{{item}}"
-            dest: "profiling_data/{{ inventory_hostname }}/"
+            dest: "profiling_data/"
         with_items: "{{ path_files.stdout_lines }}"
