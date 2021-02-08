@@ -6,11 +6,11 @@
   tasks:
       - name: Archive syslog
         archive:
-            path: "/var/log/syslog"
-            dest: "/var/log/syslog.bz2"
+            path: "/var/log/casper-node.log"
+            dest: "/var/log/casper-node.log.bz2"
             format: bz2
 
       - name: Fetching syslog
         fetch:
-            src: "/var/log/syslog.bz2"
+            src: "/var/log/casper-node.log.bz2"
             dest: "logs/{{ inventory_hostname }}/"

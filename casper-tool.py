@@ -129,10 +129,9 @@ def cli(
 )
 @click.option(
     "-j",
-    "--join-jash",
+    "--trusted-hash",
     type=str,
     help="trusted hash with which to join",
-    default="1_0_0"
 )
 def add_joiners(
     obj,
@@ -140,7 +139,7 @@ def add_joiners(
     hosts_file,
     network_name,
     node_version,
-    join_hash
+    trusted_hash
 ):
     if not network_name:
         network_name = os.path.basename(os.path.join(target_path))
@@ -162,14 +161,8 @@ def add_joiners(
     # Staging directories for config, chain
     show_val("Node version", node_version)
 
-    # Update chainspec values.
-    chainspec = create_chainspec(
-        obj["chainspec_template"], network_name, genesis_in
-    )
-
-    # Dump chainspec into staging dir
+    # Pull existing chainspec from staging dir
     chainspec_path = os.path.join(config_path, "chainspec.toml")
-    toml.dump(chainspec, open(chainspec_path, "w"))
     show_val("Chainspec", chainspec_path)
 
     # Copy casper-node into bin/VERSION/ staging dir
@@ -183,44 +176,33 @@ def add_joiners(
     os.chmod(launcher_bin_path, 0o744)
 
     faucet_path = os.path.join(staging_path, "faucet")
-    faucet_key = generate_account_key(faucet_path, "faucet", obj)
 
     # Load validators from ansible yaml inventory
     hosts = yaml.load(open(hosts_file), Loader=yaml.FullLoader)
-
-    # Setup each node, collecting all pubkey hashes.
     show_val("Node config template", obj["config_template"])
 
+    joining_nodes = list(hosts["all"]["children"]["joiners"]["hosts"].keys())
     validator_nodes = list(hosts["all"]["children"]["validators"]["hosts"].keys())
     bootstrap_nodes = list(hosts["all"]["children"]["bootstrap"]["hosts"].keys())
-    zero_weight_nodes = list(hosts["all"]["children"]["zero_weight"]["hosts"].keys())
 
-    for public_address in bootstrap_nodes:
+    for public_address in joining_nodes:
         show_val("adding joining node", public_address)
-
         key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
-
-        # TODO: refactor to take nodes_path
-        account = generate_account_key(key_path, public_address, obj)
-
-        generate_node(bootstrap_nodes, obj, nodes_path, node_version, public_address, trusted_hash)
-
+        generate_node(validator_nodes + bootstrap_nodes, obj, nodes_path, node_version, public_address, trusted_hash)
         node_path = os.path.join(nodes_path, public_address)
+
         show_val("coping files to ", node_path)
 
         # copy the bin and chain into each node's versioned fileset
         node_var_lib_casper = os.path.join(node_path, "var", "lib", "casper")
-        Path(node_var_lib_casper).mkdir(parents=True)
-
-        # should already exist
+        Path(node_var_lib_casper).mkdir(parents=True, exist_ok=True)
         node_config_path = \
                 os.path.join(node_path, "etc", "casper", node_version)
-
         node_key_path = os.path.join(node_path, "etc", "casper", "keys")
 
         # copy the faucet's secret_key.pem into each node's config
         faucet_target_path = os.path.join(node_key_path, "faucet")
-        Path(faucet_target_path).mkdir(parents=True)
+        Path(faucet_target_path).mkdir(parents=True, exist_ok=True)
         shutil.copyfile(
             os.path.join(faucet_path, "secret_key.pem"),
             os.path.join(faucet_target_path, "secret_key.pem")
@@ -332,7 +314,7 @@ def create_network(
         show_val("bootstrap node", public_address)
         key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
-        generate_node(bootstrap_nodes, obj, nodes_path, node_version, public_address)
+        generate_node(bootstrap_nodes, obj, nodes_path, node_version, public_address, None)
         validator_keys.append(account)
 
     for public_address in validator_nodes:
@@ -341,7 +323,7 @@ def create_network(
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
             bootstrap_nodes + validator_nodes,
-            obj, nodes_path, node_version, public_address)
+            obj, nodes_path, node_version, public_address, None)
         validator_keys.append(account)
 
     for public_address in zero_weight_nodes:
@@ -350,7 +332,7 @@ def create_network(
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
             bootstrap_nodes + validator_nodes,
-            obj, nodes_path, node_version, public_address)
+            obj, nodes_path, node_version, public_address, None)
         zero_weight_keys.append(account)
 
     faucet_path = os.path.join(staging_path, "faucet")
@@ -395,15 +377,19 @@ def generate_account_key(key_path, public_address, obj):
     return pubkey_hex
 
 
-def generate_node(known_addresses, obj, nodes_path, node_version, public_address):
+def generate_node(known_addresses, obj, nodes_path, node_version, public_address, trusted_hash):
     node_path = os.path.join(nodes_path, public_address)
     node_config_path = \
         os.path.join(node_path, "etc", "casper", node_version)
-    Path(node_config_path).mkdir(parents=True)
+    Path(node_config_path).mkdir(parents=True, exist_ok=True)
     config = toml.load(open(obj["config_template"]))
+
+    if trusted_hash:
+        config["node"]["trusted_hash"] = trusted_hash
+
     config["consensus"]["secret_key_path"] = os.path.join("..", "keys", "secret_key.pem")
     # add faucet to the `faucet` subfolder in keys
-    config["logging"]["format"] = "text"
+    config["logging"]["format"] = "json"
     config["network"]["public_address"] = "{}:{}".format(public_address, NODE_PORT)
     config["network"]["bind_address"] = "0.0.0.0:{}".format(NODE_PORT)
     config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]

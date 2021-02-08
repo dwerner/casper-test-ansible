@@ -1,0 +1,10 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - name: Deploy casper binaries
+        copy:
+          src: "{{ chain_path }}/staging/bin"
+          dest: /var/lib/casper
+          mode: '777'
+

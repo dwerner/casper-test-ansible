@@ -30,11 +30,8 @@
           state: absent
           path: "/storage/{{ inventory_hostname }}/"
 
-      - name: Removing rotated syslogs
-        shell: "/bin/rm -f /var/log/syslog.*"
-
       - name: Truncating syslog
-        shell: "> /var/log/syslog"
+        shell: "> /var/log/casper-node.log"
 
       - name: Get list of heaptrack files for download
         shell: ls /heaptrack.*.gz

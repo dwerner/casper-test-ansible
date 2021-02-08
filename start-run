@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+
+set -xe
+
+./build-chain
+./deploy-config-only "bootstrap, validators, zero_weight"
+./start-service-heaptracked bootstrap
+sleep 3
+./start-service-heaptracked validators
+sleep 3
+./start-service-heaptracked zero_weight
+
