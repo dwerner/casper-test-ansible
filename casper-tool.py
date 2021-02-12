@@ -413,11 +413,11 @@ def create_chainspec(template, network_name, genesis_in):
     genesis_timestamp = (datetime.utcnow() + timedelta(seconds=genesis_in)).isoformat(
         "T"
     ) + "Z"
-    show_val("Core", "{} (in {} seconds)".format(genesis_timestamp, genesis_in))
+    show_val("Genesis timestamp", "{} (in {} seconds)".format(genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
     chainspec["network"]["timestamp"] = genesis_timestamp
-    # chainspec["highway"]["minimum_round_exponent"] = 16
-    chainspec["highway"]["minimum_round_exponent"] = 12
+    chainspec["highway"]["minimum_round_exponent"] = 16
+    #chainspec["highway"]["minimum_round_exponent"] = 12
     chainspec["highway"]["maximum_round_exponent"] = 19
     return chainspec
 
