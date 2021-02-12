@@ -7,6 +7,11 @@
           src: "templates/casper-node-heaptracked.service"
           dest: /etc/systemd/system/casper-node-heaptracked.service
 
+      - name: Deploying casper-node.service file
+        copy:
+          src: "templates/casper-node.service"
+          dest: /etc/systemd/system/casper-node.service
+
       - name: Reloading systemd
         systemd:
           daemon_reload: true

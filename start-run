@@ -3,12 +3,14 @@
 set -xe
 
 ./build-chain
+./deploy "bootstrap, validators, zero_weight"
+./build-chain
 ./deploy-config-only "bootstrap, validators, zero_weight"
-./start-service-heaptracked bootstrap
+./start-service bootstrap
 sleep 3
-./start-service-heaptracked validators
+./start-service validators
 sleep 3
-./start-service-heaptracked zero_weight
+./start-service zero_weight
 sleep 3
 
 ansible -u ubuntu --become  -i aws-hosts.yaml "bootstrap, validators, zero_weight" \

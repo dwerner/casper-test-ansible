@@ -3,5 +3,5 @@
 # this script just invokes the aws cli to get a list of nodes that can be pasted into aws-hosts.yaml
 
 aws ec2 describe-instances | jq -r ".Reservations[].Instances[] |\
-                                      select( (.Tags[].Value | startswith(\"danw-test-3\")) and .Tags[].Key == \"Name\") |\
-                                      .PublicIpAddress+\":\""
+                                      select( (.Tags[].Value | startswith(\"danw-test\")) and .Tags[].Key == \"Name\") |\
+                                      .PublicIpAddress"

@@ -9,11 +9,12 @@ instance_ips = {}
 for reservation in response["Reservations"]:
     for instance in reservation["Instances"]:
         instance_id = instance["InstanceId"]
-        instance_ip_addr = instance["PublicIpAddress"]
-        for tag in instance["Tags"]:
-            if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
-                instance_names[instance_id] = tag["Value"]
-                instance_ips[instance_id] = instance_ip_addr
+        instance_ip_addr = instance.get("PublicIpAddress")
+        if instance_ip_addr:
+            for tag in instance["Tags"]:
+                if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
+                    instance_names[instance_id] = tag["Value"]
+                    instance_ips[instance_id] = instance_ip_addr
 
 operations = []
 for instance_id, old_name in instance_ips.items():
@@ -30,7 +31,6 @@ answer = input("Would you like to proceed with these changes? [y/N]")
 if answer == "y":
     for instance_id, tag in operations:
         ec2.create_tags(
-            DryRun=True,
             Resources=[instance_id],
             Tags=[tag]
         )
