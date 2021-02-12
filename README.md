@@ -22,15 +22,15 @@ Build the `casper-node` and `casper-node-launcher` binaries. Note that setting `
 
 Build the chainspec and config using `casper-tool.py` into `./artifacts/aws-chain-1` destructively.
 
-### `casper-tool.py`
+### `casper-tool.py <args>`
 
 Tool for building the chainspec and config assets for each node. Depends on an ansible inventory file in yaml format resembling example-ansible-inventory.yaml.
 
-### `clean <nodes_list>`
+### `clean <ansible_host_groups>`
 
 Remove all data and binaries from nodes.
 
-### `clean-config-and-storage-only <nodes_list>`
+### `clean-config-and-storage-only <ansible_host_groups>`
 
 Remove data only from nodes.
 
