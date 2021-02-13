@@ -17,7 +17,7 @@ for reservation in response["Reservations"]:
                 instance_names[instance_id] = tag["Value"]
 
 if instance_names:
-    print("The following instances were found with the prefix '{}':".format(instance_prefix))
+    print(f"The following instances were found with the prefix '{instance_prefix}':")
     print(yaml.dump(instance_names))
 else:
     print("Nothing to do")
@@ -30,7 +30,7 @@ if answer == "start":
     )
     print("All done.")
 elif answer == "stop":
-    print("Stopping instances")
+    print(f"Stopping {len(instance_names)} instances")
     ec2.stop_instances(
         InstanceIds=list(instance_names.keys()),
     )
