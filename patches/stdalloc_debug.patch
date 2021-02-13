@@ -1,0 +1,27 @@
+diff --git Cargo.toml Cargo.toml
+index 1781c9b7..7237ff7d 100644
+--- Cargo.toml
++++ Cargo.toml
+@@ -36,6 +36,7 @@ debug = true
+ # TODO: nightly compiler has issues with linking libraries with LTO enabled.
+ # Change this back to true once stable is supported by default.
+ lto = false
++debug = true
+ 
+ [profile.bench]
+ lto = true
+diff --git node/src/app/cli.rs node/src/app/cli.rs
+index bf554626..895fd792 100644
+--- node/src/app/cli.rs
++++ node/src/app/cli.rs
+@@ -27,8 +27,8 @@ use prometheus::Registry;
+ 
+ // We override the standard allocator to gather metrics and tune the allocator via th MALLOC_CONF
+ // env var.
+-#[global_allocator]
+-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
++// #[global_allocator]
++// static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+ 
+ // Note: The docstring on `Cli` is the help shown when calling the binary with `--help`.
+ #[derive(Debug, StructOpt)]

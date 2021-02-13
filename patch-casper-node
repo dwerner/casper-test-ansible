@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+pushd ../casper-node
+# In order for heaptrack to work, we need to be using std alloc.
+# For better heaptrack results (though much larger binaries), we should set the build to debug=true
+patch -p0 -i ../casper-test-ansible/patches/stdalloc_debug.patch
+popd
