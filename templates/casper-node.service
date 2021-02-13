@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-Environment="CASPER_ENABLE_LEGACY_NET=1"
+# Environment="CASPER_ENABLE_LIBP2P_NET=1"
 ExecStart=/var/lib/casper/bin/casper-node-launcher
 StandardOutput=syslog
 StandardError=syslog
