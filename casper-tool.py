@@ -182,7 +182,8 @@ def add_joiners(
     os.chmod(launcher_bin_path, 0o744)
 
     if Path("/var/lib/casper/bin.tar.bz2").exists():
-        show_val("Found existing binary archive", "/var/lib/casper/bin.tar.bz2")
+        show_val("Found existing binary archive",
+                 "/var/lib/casper/bin.tar.bz2")
         shutil.copyfile("/var/lib/casper/bin.tar.bz2", staging_path)
     else:
         show_val("Creating binary archive", "bin.tar.bz2")
@@ -302,19 +303,24 @@ def create_network(
     toml.dump(chainspec, open(chainspec_path, "w"))
     show_val("Chainspec", chainspec_path)
 
-    # Copy casper-node into bin/VERSION/ staging dir
-    node_bin_path = os.path.join(bin_version_path, "casper-node")
-    shutil.copyfile(obj["casper-node-bin"], node_bin_path)
-    os.chmod(node_bin_path, 0o744)
+    if Path("/var/lib/casper/bin.tar.bz2").exists():
+        show_val("Found existing binary archive",
+                 "/var/lib/casper/bin.tar.bz2")
+        shutil.copyfile("/var/lib/casper/bin.tar.bz2", staging_path)
+    else:
+        # Copy casper-node into bin/VERSION/ staging dir
+        node_bin_path = os.path.join(bin_version_path, "casper-node")
+        shutil.copyfile(obj["casper-node-bin"], node_bin_path)
+        os.chmod(node_bin_path, 0o744)
 
-    # Copy casper-node-launcher into bin/ staging dir
-    launcher_bin_path = os.path.join(bin_path, "casper-node-launcher")
-    shutil.copyfile(obj["casper-node-launcher-bin"], launcher_bin_path)
-    os.chmod(launcher_bin_path, 0o744)
+        # Copy casper-node-launcher into bin/ staging dir
+        launcher_bin_path = os.path.join(bin_path, "casper-node-launcher")
+        shutil.copyfile(obj["casper-node-launcher-bin"], launcher_bin_path)
+        os.chmod(launcher_bin_path, 0o744)
 
-    show_val("Creating binary archive", "bin.tar.bz2")
-    with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2") as tar:
-        tar.add(bin_path, arcname=os.path.basename(bin_path))
+        show_val("Creating binary archive", "bin.tar.bz2")
+        with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2", compresslevel=1) as tar:
+            tar.add(bin_path, arcname=os.path.basename(bin_path))
 
     # Load validators from ansible yaml inventory
     hosts = yaml.load(open(hosts_file), Loader=yaml.FullLoader)
