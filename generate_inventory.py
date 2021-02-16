@@ -10,6 +10,9 @@ template_inventory = yaml.load(
     open("example-ansible-inventory.yaml"), Loader=yaml.FullLoader)
 
 
+# use private ips for ansible connections
+use_private_ips = True
+
 bootstrap = 1
 # validators = 15
 validators = 75
@@ -30,20 +33,27 @@ for reservation in response["Reservations"]:
     for instance in reservation["Instances"]:
 
         instance_id = instance["InstanceId"]
-        instance_ip_addr = instance.get("PublicIpAddress")
-        if instance_ip_addr:
+        public_ip_addr = instance.get("PublicIpAddress")
+        if public_ip_addr:
+            if use_private_ips:
+                ansible_host_ip = instance.get("PrivateIpAddress")
+            else:
+                ansible_host_ip = public_ip_addr
             for tag in instance["Tags"]:
                 if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
 
                     if instance_count < bootstrap:
-                        print(instance_count, "bootstrap", instance_ip_addr)
-                        bootstrap_hosts[instance_ip_addr] = ''
+                        print(instance_count, "bootstrap", public_ip_addr)
+                        bootstrap_hosts[public_ip_addr] = {
+                            "ansible_host": ansible_host_ip}
                     elif instance_count >= bootstrap and instance_count < bootstrap + validators:
-                        print(instance_count, "validator", instance_ip_addr)
-                        validator_hosts[instance_ip_addr] = ''
+                        print(instance_count, "validator", public_ip_addr)
+                        validator_hosts[public_ip_addr] = {
+                            "ansible_host": ansible_host_ip}
                     elif instance_count >= bootstrap + validators and instance_count < bootstrap + validators + zero_weight:
-                        print(instance_count, "zero weight", instance_ip_addr)
-                        zero_weight_hosts[instance_ip_addr] = ''
+                        print(instance_count, "zero weight", public_ip_addr)
+                        zero_weight_hosts[public_ip_addr] = {
+                            "ansible_host": ansible_host_ip}
 
                     instance_count += 1
 
