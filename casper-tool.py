@@ -181,9 +181,13 @@ def add_joiners(
     shutil.copyfile(obj["casper-node-launcher-bin"], launcher_bin_path)
     os.chmod(launcher_bin_path, 0o744)
 
-    show_val("Creating binary archive", "bin.tar.bz2")
-    with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2", compresslevel=1) as tar:
-        tar.add(bin_path, arcname=os.path.basename(bin_path))
+    if Path("/var/lib/casper/bin.tar.bz2").exists():
+        show_val("Found existing binary archive", "/var/lib/casper/bin.tar.bz2")
+        shutil.copyfile("/var/lib/casper/bin.tar.bz2", staging_path)
+    else:
+        show_val("Creating binary archive", "bin.tar.bz2")
+        with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2", compresslevel=1) as tar:
+            tar.add(bin_path, arcname=os.path.basename(bin_path))
 
     faucet_path = os.path.join(staging_path, "faucet")
 

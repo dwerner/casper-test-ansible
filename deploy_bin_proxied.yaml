@@ -1,0 +1,10 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - name: Deploy binary archive to ansible deployer proxy
+        copy:
+          src: "{{ chain_path }}/staging/bin.tar.bz2"
+          dest: /home/ubuntu/
+          mode: '777'
+
