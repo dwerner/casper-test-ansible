@@ -314,12 +314,13 @@ def create_network(
     shutil.copyfile(obj["casper_client_argv0"][0], client_bin_path)
     os.chmod(client_bin_path, 0o744)
 
+    bin_archive_path = os.path.join(staging_path, "bin.tar.bz2")
     if Path("/home/ubuntu/bin.tar.bz2").exists():
         show_val("Found existing binary archive", "/home/ubuntu/bin.tar.bz2")
-        shutil.copyfile("/home/ubuntu/bin.tar.bz2", staging_path)
+        shutil.copyfile("/home/ubuntu/bin.tar.bz2", bin_archive_path)
     else:
         show_val("Creating binary archive", "bin.tar.bz2")
-        with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2") as tar:
+        with tarfile.open(bin_archive_path, "w:bz2") as tar:
             tar.add(bin_path, arcname=os.path.basename(bin_path))
 
     # Load validators from ansible yaml inventory
