@@ -20,7 +20,10 @@
           path: "/storage/{{ inventory_hostname }}/"
 
       - name: Truncating syslog
-        shell: "> /var/log/casper-node.log"
+        shell: "> /var/log/syslog"
+
+      - name: Removing any rotated syslog.* files
+        shell: "rm /var/log/syslog.*"
 
       - name: Get list of heaptrack files for removal
         shell: ls /heaptrack.*.gz

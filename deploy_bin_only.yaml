@@ -2,9 +2,15 @@
   user: ubuntu
   become: true
   tasks:
-      - name: Deploy casper binaries
+      - name: Deploy binary archive
         copy:
-          src: "{{ chain_path }}/staging/bin"
+          src: "{{ chain_path }}/staging/bin.tar.bz2"
           dest: /var/lib/casper
           mode: '777'
+
+      - name: Unarchive binaries into /var/lib/casper
+        unarchive:
+          src: "/var/lib/casper/bin.tar.bz2"
+          dest: /var/lib/casper
+          remote_src: yes
 

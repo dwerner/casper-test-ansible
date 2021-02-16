@@ -1,5 +1,7 @@
 all:
     children:
+        joiners:
+            hosts:
         bootstrap:
             hosts:
         validators:

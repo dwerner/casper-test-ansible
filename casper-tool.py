@@ -8,6 +8,7 @@ import click
 import shutil
 import toml
 import yaml
+import tarfile
 from pathlib import Path
 from itertools import chain
 
@@ -20,15 +21,18 @@ NODE_PORT = 34553
     "-b",
     "--basedir",
     help="casper-node source code base directory",
-    type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True),
+    type=click.Path(exists=True, dir_okay=True,
+                    file_okay=False, readable=True),
     default=os.path.join(os.path.dirname(__file__), "..", "casper-node"),
 )
 @click.option(
     "-l",
     "--launcher",
     help="casper-node-launcher source code base directory",
-    type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True),
-    default=os.path.join(os.path.dirname(__file__), "..", "casper-node-launcher"),
+    type=click.Path(exists=True, dir_okay=True,
+                    file_okay=False, readable=True),
+    default=os.path.join(os.path.dirname(__file__),
+                         "..", "casper-node-launcher"),
 )
 @click.option(
     "--casper-client",
@@ -94,17 +98,19 @@ def cli(
             "cargo",
             "run",
             "--quiet",
-            "--manifest-path={}".format(os.path.join(basedir, "client", "Cargo.toml")),
+            "--manifest-path={}".format(os.path.join(basedir,
+                                                     "client", "Cargo.toml")),
             "--",
         ]
 
     obj["casper-node-bin"] = \
-            os.path.join(basedir, "target", "release", "casper-node")
+        os.path.join(basedir, "target", "release", "casper-node")
     obj["casper-node-launcher-bin"] = \
-            os.path.join(launcher, "target", "release", "casper-node-launcher")
+        os.path.join(launcher, "target", "release", "casper-node-launcher")
 
     ctx.obj = obj
     return
+
 
 @cli.command("add-joiners")
 @click.pass_obj
@@ -148,15 +154,15 @@ def add_joiners(
     show_val("Output path", target_path)
 
     nodes_path = \
-            os.path.join(target_path, "nodes")
+        os.path.join(target_path, "nodes")
 
     staging_path = os.path.join(target_path, "staging")
     bin_path = \
-            os.path.join(staging_path, "bin")
+        os.path.join(staging_path, "bin")
     bin_version_path = \
-            os.path.join(staging_path, "bin", node_version)
+        os.path.join(staging_path, "bin", node_version)
     config_path = \
-            os.path.join(staging_path, "config")
+        os.path.join(staging_path, "config")
 
     # Staging directories for config, chain
     show_val("Node version", node_version)
@@ -175,6 +181,10 @@ def add_joiners(
     shutil.copyfile(obj["casper-node-launcher-bin"], launcher_bin_path)
     os.chmod(launcher_bin_path, 0o744)
 
+    show_val("Creating binary archive", "bin.tar.bz2")
+    with tarfile.open(os.path.join(staging_path, "bin.tar.bz2"), "w:bz2") as tar:
+        tar.add(bin_path, arcname=os.path.basename(bin_path))
+
     faucet_path = os.path.join(staging_path, "faucet")
 
     # Load validators from ansible yaml inventory
@@ -182,13 +192,15 @@ def add_joiners(
     show_val("Node config template", obj["config_template"])
 
     joining_nodes = list(hosts["all"]["children"]["joiners"]["hosts"].keys())
-    validator_nodes = list(hosts["all"]["children"]["validators"]["hosts"].keys())
-    bootstrap_nodes = list(hosts["all"]["children"]["bootstrap"]["hosts"].keys())
+    validator_nodes = list(hosts["all"]["children"]
+                           ["validators"]["hosts"].keys())
+    bootstrap_nodes = list(hosts["all"]["children"]
+                           ["bootstrap"]["hosts"].keys())
 
     for public_address in joining_nodes:
         show_val("adding joining node", public_address)
-        key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
-        generate_node(validator_nodes + bootstrap_nodes, obj, nodes_path, node_version, public_address, trusted_hash)
+        generate_node(validator_nodes + bootstrap_nodes, obj,
+                      nodes_path, node_version, public_address, trusted_hash)
         node_path = os.path.join(nodes_path, public_address)
 
         show_val("copying files to ", node_path)
@@ -197,7 +209,7 @@ def add_joiners(
         node_var_lib_casper = os.path.join(node_path, "var", "lib", "casper")
         Path(node_var_lib_casper).mkdir(parents=True, exist_ok=True)
         node_config_path = \
-                os.path.join(node_path, "etc", "casper", node_version)
+            os.path.join(node_path, "etc", "casper", node_version)
         node_key_path = os.path.join(node_path, "etc", "casper", "keys")
 
         # copy the faucet's secret_key.pem into each node's config
@@ -258,15 +270,15 @@ def create_network(
     show_val("Output path", target_path)
 
     nodes_path = \
-            os.path.join(target_path, "nodes")
+        os.path.join(target_path, "nodes")
 
     staging_path = os.path.join(target_path, "staging")
     bin_path = \
-            os.path.join(staging_path, "bin")
+        os.path.join(staging_path, "bin")
     bin_version_path = \
-            os.path.join(staging_path, "bin", node_version)
+        os.path.join(staging_path, "bin", node_version)
     config_path = \
-            os.path.join(staging_path, "config")
+        os.path.join(staging_path, "config")
 
     # Staging directories for config, chain
     show_val("Node version", node_version)
@@ -296,15 +308,33 @@ def create_network(
     shutil.copyfile(obj["casper-node-launcher-bin"], launcher_bin_path)
     os.chmod(launcher_bin_path, 0o744)
 
+    # Copy casper-client into bin/ staging dir
+    client_bin_path = os.path.join(bin_path, "casper-client")
+    show_val("copying client", obj["casper_client_argv0"][0])
+    shutil.copyfile(obj["casper_client_argv0"][0], client_bin_path)
+    os.chmod(client_bin_path, 0o744)
+
+    bin_archive_path = os.path.join(staging_path, "bin.tar.bz2")
+    if Path("/home/ubuntu/bin.tar.bz2").exists():
+        show_val("Found existing binary archive", "/home/ubuntu/bin.tar.bz2")
+        shutil.copyfile("/home/ubuntu/bin.tar.bz2", bin_archive_path)
+    else:
+        show_val("Creating binary archive", "bin.tar.bz2")
+        with tarfile.open(bin_archive_path, "w:bz2") as tar:
+            tar.add(bin_path, arcname=os.path.basename(bin_path))
+
     # Load validators from ansible yaml inventory
     hosts = yaml.load(open(hosts_file), Loader=yaml.FullLoader)
 
     # Setup each node, collecting all pubkey hashes.
     show_val("Node config template", obj["config_template"])
 
-    validator_nodes = list(hosts["all"]["children"]["validators"]["hosts"].keys())
-    bootstrap_nodes = list(hosts["all"]["children"]["bootstrap"]["hosts"].keys())
-    zero_weight_nodes = list(hosts["all"]["children"]["zero_weight"]["hosts"].keys())
+    validator_nodes = list(hosts["all"]["children"]
+                           ["validators"]["hosts"].keys())
+    bootstrap_nodes = list(hosts["all"]["children"]
+                           ["bootstrap"]["hosts"].keys())
+    zero_weight_nodes = list(
+        hosts["all"]["children"]["zero_weight"]["hosts"].keys())
 
     bootstrap_keys = list()
     validator_keys = list()
@@ -312,14 +342,17 @@ def create_network(
 
     for public_address in bootstrap_nodes:
         show_val("bootstrap node", public_address)
-        key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
+        key_path = os.path.join(
+            nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
-        generate_node(bootstrap_nodes, obj, nodes_path, node_version, public_address, None)
+        generate_node(bootstrap_nodes, obj, nodes_path,
+                      node_version, public_address, None)
         validator_keys.append(account)
 
     for public_address in validator_nodes:
         show_val("validator node", public_address)
-        key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
+        key_path = os.path.join(
+            nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
             bootstrap_nodes + validator_nodes,
@@ -328,7 +361,8 @@ def create_network(
 
     for public_address in zero_weight_nodes:
         show_val("zero weight node", public_address)
-        key_path = os.path.join(nodes_path, public_address, "etc", "casper", "keys")
+        key_path = os.path.join(
+            nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
             bootstrap_nodes + validator_nodes,
@@ -340,7 +374,8 @@ def create_network(
 
     accounts_path = os.path.join(config_path, "accounts.csv")
     # Copy accounts.csv into staging dir
-    create_accounts_csv(open(accounts_path, "w"), faucet_key, bootstrap_keys + validator_keys, zero_weight_keys)
+    create_accounts_csv(open(accounts_path, "w"), faucet_key,
+                        bootstrap_keys + validator_keys, zero_weight_keys)
 
     for public_address in bootstrap_nodes + validator_nodes + zero_weight_nodes:
         node_path = os.path.join(nodes_path, public_address)
@@ -352,7 +387,7 @@ def create_network(
 
         # should already exist
         node_config_path = \
-                os.path.join(node_path, "etc", "casper", node_version)
+            os.path.join(node_path, "etc", "casper", node_version)
 
         node_key_path = os.path.join(node_path, "etc", "casper", "keys")
 
@@ -387,12 +422,15 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     if trusted_hash:
         config["node"]["trusted_hash"] = trusted_hash
 
-    config["consensus"]["secret_key_path"] = os.path.join("..", "keys", "secret_key.pem")
+    config["consensus"]["secret_key_path"] = os.path.join(
+        "..", "keys", "secret_key.pem")
     # add faucet to the `faucet` subfolder in keys
     config["logging"]["format"] = "json"
-    config["network"]["public_address"] = "{}:{}".format(public_address, NODE_PORT)
+    config["network"]["public_address"] = "{}:{}".format(
+        public_address, NODE_PORT)
     config["network"]["bind_address"] = "0.0.0.0:{}".format(NODE_PORT)
-    config["network"]["known_addresses"] = ["{}:{}".format(n, NODE_PORT) for n in known_addresses]
+    config["network"]["known_addresses"] = [
+        "{}:{}".format(n, NODE_PORT) for n in known_addresses]
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path
@@ -413,11 +451,12 @@ def create_chainspec(template, network_name, genesis_in):
     genesis_timestamp = (datetime.utcnow() + timedelta(seconds=genesis_in)).isoformat(
         "T"
     ) + "Z"
-    show_val("Core", "{} (in {} seconds)".format(genesis_timestamp, genesis_in))
+    show_val("Genesis timestamp", "{} (in {} seconds)".format(
+        genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
     chainspec["network"]["timestamp"] = genesis_timestamp
-    # chainspec["highway"]["minimum_round_exponent"] = 16
-    chainspec["highway"]["minimum_round_exponent"] = 12
+    chainspec["highway"]["minimum_round_exponent"] = 16
+    #chainspec["highway"]["minimum_round_exponent"] = 12
     chainspec["highway"]["maximum_round_exponent"] = 19
     return chainspec
 

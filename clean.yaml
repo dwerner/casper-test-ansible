@@ -33,6 +33,9 @@
       - name: Truncating syslog
         shell: "> /var/log/syslog"
 
+      - name: Removing any rotated syslog.* files
+        shell: "rm /var/log/syslog.*"
+
       - name: Get list of heaptrack files for download
         shell: ls /heaptrack.*.gz
         register: path_files

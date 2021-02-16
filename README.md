@@ -96,6 +96,14 @@ Start all `casper-node*.service`s on `<ansible_host_groups>`.
 
 Using `boto3`, rename matching instances (`danw-test*`) with `danw-test-<PublicIpAddress>`.
 
+### `manage_instances.py`
+
+Using `boto3`, stop/start matching instances (`danw-test*`).
+
+### `generate_inventory.py`
+
+Using `boto3` and `example-ansible-inventory.yaml` (as input) generate a new `generated-hosts.yaml` (will overwrite).  This can be copied into `aws-hosts.yaml` and scripts run from there.
+
 
 ## Use examples:
 

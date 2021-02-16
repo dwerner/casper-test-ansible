@@ -1,0 +1,36 @@
+- hosts: "{{ deploy_hosts }}"
+  user: ubuntu
+  become: true
+  tasks:
+      - name: Deploy binary archive to ansible deployer proxy
+        copy:
+          src: "{{ chain_path }}/staging/bin.tar.bz2"
+          dest: /home/ubuntu/
+          mode: '777'
+
+      - name: Unarchive binaries into /home/ubuntu/bin
+        unarchive:
+          src: "/home/ubuntu/bin.tar.bz2"
+          dest: /home/ubuntu/
+          remote_src: yes
+
+      - name: copy casper-node
+        copy:
+          src: /home/ubuntu/bin/1_0_0/casper-node
+          dest: /home/ubuntu/casper-node/target/release/casper-node
+          remote_src: yes
+          mode: '777'
+
+      - name: copy casper-node-launcher
+        copy:
+          src: /home/ubuntu/bin/casper-node-launcher
+          dest: /home/ubuntu/casper-node-launcher/target/release/casper-node-launcher
+          remote_src: yes
+          mode: '777'
+
+      - name: copy casper-client
+        copy:
+          src: /home/ubuntu/bin/casper-client
+          dest: /home/ubuntu/casper-node/target/release/casper-client
+          remote_src: yes
+          mode: '777'
