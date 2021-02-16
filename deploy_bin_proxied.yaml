@@ -13,7 +13,7 @@
           src: "/home/ubuntu/bin.tar.bz2"
           dest: /home/ubuntu/
           remote_src: yes
-      
+
       - name: copy casper-node
         copy:
           src: /home/ubuntu/bin/1_0_0/casper-node
@@ -24,10 +24,10 @@
       - name: copy casper-node-launcher
         copy:
           src: /home/ubuntu/bin/casper-node-launcher
-          dest: /home/ubuntu/casper-node-launcher/target/release/casper-node
+          dest: /home/ubuntu/casper-node-launcher/target/release/casper-node-launcher
           remote_src: yes
           mode: '777'
-      
+
       - name: copy casper-client
         copy:
           src: /home/ubuntu/bin/casper-client
