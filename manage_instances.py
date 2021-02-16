@@ -14,10 +14,11 @@ for reservation in response["Reservations"]:
         instance_id = instance["InstanceId"]
         for tag in instance["Tags"]:
             if tag["Key"] == "Name" and tag["Value"].startswith(instance_prefix):
-                instance_names[instance_id] = tag["Value"]
+                instance_names[instance_id] = f"{tag['Value']} - {instance['State']['Name']}"
 
 if instance_names:
-    print(f"The following instances were found with the prefix '{instance_prefix}':")
+    print(
+        f"The following instances were found with the prefix '{instance_prefix}':")
     print(yaml.dump(instance_names))
 else:
     print("Nothing to do")

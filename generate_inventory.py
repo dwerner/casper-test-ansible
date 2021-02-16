@@ -6,16 +6,23 @@ import yaml
 ec2 = boto3.client('ec2')
 response = ec2.describe_instances()
 instance_names = {}
-template_inventory = yaml.load(open("example-ansible-inventory.yaml"), Loader=yaml.FullLoader)
+template_inventory = yaml.load(
+    open("example-ansible-inventory.yaml"), Loader=yaml.FullLoader)
+
 
 bootstrap = 1
+# validators = 15
 validators = 75
+# zero_weight = 1
 zero_weight = 25
 
 instance_count = 0
-bootstrap_hosts = template_inventory["all"]["children"]["bootstrap"]["hosts"] = {}
-validator_hosts = template_inventory["all"]["children"]["validators"]["hosts"] = {}
-zero_weight_hosts = template_inventory["all"]["children"]["zero_weight"]["hosts"] = {}
+bootstrap_hosts = template_inventory["all"]["children"]["bootstrap"]["hosts"] = {
+}
+validator_hosts = template_inventory["all"]["children"]["validators"]["hosts"] = {
+}
+zero_weight_hosts = template_inventory["all"]["children"]["zero_weight"]["hosts"] = {
+}
 
 for reservation in response["Reservations"]:
     print("reservation")
@@ -42,5 +49,3 @@ for reservation in response["Reservations"]:
 
 yaml.dump(template_inventory, open("generated-hosts.yaml", "w"))
 print("all done, wrote ./generated-hosts.yaml", template_inventory)
-
-

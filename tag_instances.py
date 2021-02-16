@@ -21,7 +21,7 @@ operations = {}
 for instance_id, old_name in instance_ips.items():
     name = "danw-test-{}".format(instance_ips[instance_id])
     if old_name != name:
-        operations[instance_id] = {"Key":"Name", "Value": name }
+        operations[instance_id] = {"Key": "Name", "Value": name}
 
 if operations:
     print("The following tags will be created:")
@@ -29,7 +29,8 @@ if operations:
 else:
     print("Nothing to do, all instances match desired naming scheme")
 
-answer = input("Would you like to proceed with these changes? [y/N]")
+answer = input(
+    f"Would you like to proceed with these changes to {len(operations)} instances? [y/N]")
 if answer == "y":
     for instance_id, tag in operations.items():
         ec2.create_tags(
