@@ -455,9 +455,10 @@ def create_chainspec(template, network_name, genesis_in):
         genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
     chainspec["network"]["timestamp"] = genesis_timestamp
-    chainspec["highway"]["minimum_round_exponent"] = 16
-    #chainspec["highway"]["minimum_round_exponent"] = 12
+    # chainspec["highway"]["minimum_round_exponent"] = 16
+    chainspec["highway"]["minimum_round_exponent"] = 13
     chainspec["highway"]["maximum_round_exponent"] = 19
+    chainspec["deploys"]["block_max_transfer_count"] = 100
     return chainspec
 
 

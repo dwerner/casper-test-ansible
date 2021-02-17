@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+export RUSTFLAGS=-Cforce-frame-pointers=yes
+
 pushd ../casper-node
 cargo build --release --package casper-node
 cargo build --release --package casper-client
