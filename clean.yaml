@@ -44,7 +44,7 @@
         with_items: "{{ syslog_files.stdout_lines }}"
 
       - name: Get list of heaptrack files
-        shell: find /var/log -name "heaptrack.*.gz"
+        shell: find / -name "heaptrack.*.gz"
         register: path_files
 
       - name: Removing profiling data for heaptrack
