@@ -1,0 +1,15 @@
+- hosts: "{{ fetch_hosts }}"
+  user: ubuntu
+  become: true
+  gather_facts: no
+
+  tasks:
+      - name: Get list of queue dump files for download
+        shell: ls /tmp/queue_dump*
+        register: path_files
+
+      - name: Fetch dump files to local machine ./queue_dumps/
+        fetch:
+            src : "{{item}}"
+            dest: "queue_dumps/"
+        with_items: "{{ path_files.stdout_lines }}"

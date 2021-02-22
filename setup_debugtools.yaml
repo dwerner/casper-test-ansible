@@ -9,8 +9,12 @@
               - gdb
               - valgrind
               - python3-pip
+              - linux-tools-common
+              - linux-tools-aws
+              - linux-tools-5.4.0-1029-aws
           state: latest
           update_cache: yes
+
       - pip:
           name:
               - boto3

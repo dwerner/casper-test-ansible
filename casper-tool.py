@@ -349,13 +349,15 @@ def create_network(
                       node_version, public_address, None)
         validator_keys.append(account)
 
+    initial_known_nodes = bootstrap_nodes  # + validator_nodes
+
     for public_address in validator_nodes:
         show_val("validator node", public_address)
         key_path = os.path.join(
             nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
-            bootstrap_nodes + validator_nodes,
+            initial_known_nodes,
             obj, nodes_path, node_version, public_address, None)
         validator_keys.append(account)
 
@@ -365,7 +367,7 @@ def create_network(
             nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
-            bootstrap_nodes + validator_nodes,
+            initial_known_nodes,
             obj, nodes_path, node_version, public_address, None)
         zero_weight_keys.append(account)
 
@@ -458,7 +460,7 @@ def create_chainspec(template, network_name, genesis_in):
     # chainspec["highway"]["minimum_round_exponent"] = 16
     chainspec["highway"]["minimum_round_exponent"] = 13
     chainspec["highway"]["maximum_round_exponent"] = 19
-    chainspec["deploys"]["block_max_transfer_count"] = 100
+    chainspec["deploys"]["block_max_transfer_count"] = 200
     return chainspec
 
 

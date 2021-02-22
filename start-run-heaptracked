@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+
+set -xe
+
+./build-chain
+./deploy-config-only "bootstrap, validators, zero_weight"
+./start-service-heaptracked bootstrap
+sleep 3
+./start-service-heaptracked validators
+sleep 3
+./start-service-heaptracked zero_weight
+sleep 3
+
+ansible -u ubuntu --become  -i aws-hosts.yaml "bootstrap, validators, zero_weight" \
+    --forks 10 -a 'bash -c "systemctl status casper-node-heaptracked.service | grep Memory"'
+

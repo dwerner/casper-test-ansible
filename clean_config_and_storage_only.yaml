@@ -23,7 +23,7 @@
         shell: "> /var/log/syslog"
 
       - name: Get list of syslog files for deletion
-        shell: find /var/log -name "syslog.*"
+        shell: find /var/log -maxdepth 1 -name "syslog.*"
         register: syslog_files
 
       - name: Removing syslogs
@@ -33,7 +33,7 @@
         with_items: "{{ syslog_files.stdout_lines }}"
 
       - name: Get list of heaptrack files
-        shell: find / -name "heaptrack.*.gz"
+        shell: find / -maxdepth 1 -name "heaptrack.casper-node.*.gz"
         register: path_files
 
       - name: Removing profiling data for heaptrack
