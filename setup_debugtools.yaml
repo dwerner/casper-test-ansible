@@ -12,6 +12,10 @@
               - linux-tools-common
               - linux-tools-aws
               - linux-tools-5.4.0-1029-aws
+              - pcp
+              - libpcp-pmda3-dev
+              - libpcp3-dev
+              - apache2
           state: latest
           update_cache: yes
 

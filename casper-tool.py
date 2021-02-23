@@ -374,10 +374,10 @@ def create_network(
     faucet_path = os.path.join(staging_path, "faucet")
     faucet_key = generate_account_key(faucet_path, "faucet", obj)
 
-    accounts_path = os.path.join(config_path, "accounts.csv")
-    # Copy accounts.csv into staging dir
-    create_accounts_csv(open(accounts_path, "w"), faucet_key,
-                        bootstrap_keys + validator_keys, zero_weight_keys)
+    accounts_path = os.path.join(config_path, "accounts.toml")
+    # Copy accounts.toml into staging dir
+    create_accounts_toml(accounts_path, faucet_key,
+                         bootstrap_keys + validator_keys, zero_weight_keys)
 
     for public_address in bootstrap_nodes + validator_nodes + zero_weight_nodes:
         node_path = os.path.join(nodes_path, public_address)
@@ -464,25 +464,37 @@ def create_chainspec(template, network_name, genesis_in):
     return chainspec
 
 
-def create_accounts_csv(output_file, faucet, validators, zero_weight_ops):
+def create_accounts_toml(accounts_path, faucet, validators, zero_weight_ops):
     """
-    :param output_file: accounts.csv
+    :param output_file: accounts.toml
     :param faucet: public key of faucet account
     :param validators: public keys of validators with weight
     :param zero_weight_ops: public keys of zero weight operators
     :return: output_file will be an appropriately formatted csv
     """
-    output_file.write("{},{},{}\n".format(faucet, 10**32, 0))
+    accounts = {"accounts": [], "delegators": []}
 
     for index, key_hex in enumerate(validators):
         motes = 10**32
         staking_weight = 10**13 + index
-        output_file.write("{},{},{}\n".format(key_hex, motes, staking_weight))
+        account = {
+            "public_key": key_hex,
+            "balance": str(motes),
+            "bonded_amount": str(staking_weight),
+        }
+        accounts["accounts"].append(account)
 
     for key_hex in zero_weight_ops:
         motes = 10**32
         staking_weight = 0
-        output_file.write("{},{},{}\n".format(key_hex, motes, staking_weight))
+        account = {
+            "public_key": key_hex,
+            "balance": str(motes),
+            "bonded_amount": str(staking_weight),
+        }
+        accounts["accounts"].append(account)
+
+    toml.dump(accounts, open(accounts_path, "w"))
 
 
 def run_client(argv0, *args):
