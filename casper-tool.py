@@ -472,7 +472,13 @@ def create_accounts_toml(accounts_path, faucet, validators, zero_weight_ops):
     :param zero_weight_ops: public keys of zero weight operators
     :return: output_file will be an appropriately formatted csv
     """
-    accounts = {"accounts": [], "delegators": []}
+    accounts = {"accounts": [
+        {
+            "public_key": faucet,
+            "balance": str(10**32),
+            "bonded_amount": str(0),
+        }
+    ], "delegators": []}
 
     for index, key_hex in enumerate(validators):
         motes = 10**32
