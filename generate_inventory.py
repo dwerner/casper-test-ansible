@@ -15,7 +15,7 @@ bootstrap = 1
 # validators = 15
 validators = 75
 # zero_weight = 1
-zero_weight = 25
+zero_weight = 225
 
 instance_count = 0
 bootstrap_hosts = template_inventory["all"]["children"]["bootstrap"]["hosts"] = {
@@ -32,10 +32,11 @@ for reservation in response["Reservations"]:
 
         instance_id = instance["InstanceId"]
         public_ip_addr = instance.get("PublicIpAddress")
-        if public_ip_addr:
+
+        instance_state = instance['State']['Name']
+        if public_ip_addr and instance_state == "running":
             for tag in instance["Tags"]:
                 if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
-
                     if instance_count < bootstrap:
                         print(instance_count, "bootstrap", public_ip_addr)
                         bootstrap_hosts[public_ip_addr] = ''

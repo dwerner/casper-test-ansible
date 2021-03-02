@@ -211,6 +211,7 @@ def add_joiners(
         node_config_path = \
             os.path.join(node_path, "etc", "casper", node_version)
         node_key_path = os.path.join(node_path, "etc", "casper", "keys")
+        generate_account_key(node_key_path, public_address, obj)
 
         # copy the faucet's secret_key.pem into each node's config
         faucet_target_path = os.path.join(node_key_path, "faucet")
@@ -436,6 +437,8 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path
+    config["storage"]["path"] = storage_path
+    config["network"]["gossip_interval"] = 120000
     config["consensus"]["unit_hashes_folder"] = storage_path
     toml.dump(config, open(os.path.join(node_config_path, "config.toml", ), "w"))
 
@@ -457,10 +460,12 @@ def create_chainspec(template, network_name, genesis_in):
         genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
     chainspec["network"]["timestamp"] = genesis_timestamp
-    # chainspec["highway"]["minimum_round_exponent"] = 16
     chainspec["highway"]["minimum_round_exponent"] = 13
-    chainspec["highway"]["maximum_round_exponent"] = 19
-    chainspec["deploys"]["block_max_transfer_count"] = 200
+    chainspec["highway"]["maximum_round_exponent"] = 16
+    chainspec["core"]["unbonding_delay"] = 7 # normally 14
+    chainspec["core"]["auction_delay"] = 1 # normally 3
+    chainspec["core"]["era_duration"] = "15min" # normally 30min
+    chainspec["deploys"]["block_max_transfer_count"] = 500
     return chainspec
 
 
@@ -486,7 +491,7 @@ def create_accounts_toml(accounts_path, faucet, validators, zero_weight_ops):
         account = {
             "public_key": key_hex,
             "balance": str(motes),
-            "bonded_amount": str(staking_weight),
+            "validator" : { "bonded_amount": str(staking_weight) },
         }
         accounts["accounts"].append(account)
 

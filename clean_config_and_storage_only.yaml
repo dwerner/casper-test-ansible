@@ -3,16 +3,6 @@
   become: true
   gather_facts: no
   tasks:
-      - name: Stopping casper-node.service
-        service:
-          name: casper-node-heaptracked.service
-          enabled: yes
-          state: stopped
-
-      - name: Removing /etc/casper
-        file:
-          state: absent
-          path: /etc/casper/
 
       - name: "removing /storage/{{ inventory_hostname }}/"
         file:
@@ -31,14 +21,4 @@
             path: "{{item}}"
             state: absent
         with_items: "{{ syslog_files.stdout_lines }}"
-
-      - name: Get list of heaptrack files
-        shell: find / -maxdepth 1 -name "heaptrack.casper-node.*.gz"
-        register: path_files
-
-      - name: Removing profiling data for heaptrack
-        file:
-            path: "{{item}}"
-            state: absent
-        with_items: "{{ path_files.stdout_lines }}"
 

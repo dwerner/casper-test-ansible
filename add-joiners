@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+./casper-tool.py -b ../casper-node add-joiners -j $1 -k aws-hosts.yaml artifacts/aws-chain-1
+

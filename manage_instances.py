@@ -19,21 +19,23 @@ for reservation in response["Reservations"]:
 if instance_names:
     print(
         f"The following instances were found with the prefix '{instance_prefix}':")
-    print(yaml.dump(instance_names))
+    print(instance_names)
 else:
     print("Nothing to do")
 
 answer = input("What would you like to do? [stop/start/CANCEL]")
 if answer == "start":
-    print("Starting instances")
+    to_start = list([name for (name, state) in instance_names.items() if state.endswith('stopped')])
+    print(f"Starting {len(to_start)} instances")
     ec2.start_instances(
-        InstanceIds=list(instance_names.keys()),
+        InstanceIds=to_start,
     )
     print("All done.")
 elif answer == "stop":
-    print(f"Stopping {len(instance_names)} instances")
+    to_stop = list([name for (name, state) in instance_names.items() if state.endswith('running')])
+    print(f"Stopping {len(to_stop)} instances")
     ec2.stop_instances(
-        InstanceIds=list(instance_names.keys()),
+        InstanceIds=to_stop,
     )
     print("All done.")
 else:
