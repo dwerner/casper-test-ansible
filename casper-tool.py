@@ -211,6 +211,7 @@ def add_joiners(
         node_config_path = \
             os.path.join(node_path, "etc", "casper", node_version)
         node_key_path = os.path.join(node_path, "etc", "casper", "keys")
+        generate_account_key(node_key_path, public_address, obj)
 
         # copy the faucet's secret_key.pem into each node's config
         faucet_target_path = os.path.join(node_key_path, "faucet")
@@ -349,13 +350,15 @@ def create_network(
                       node_version, public_address, None)
         validator_keys.append(account)
 
+    initial_known_nodes = bootstrap_nodes  # + validator_nodes
+
     for public_address in validator_nodes:
         show_val("validator node", public_address)
         key_path = os.path.join(
             nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
-            bootstrap_nodes + validator_nodes,
+            initial_known_nodes,
             obj, nodes_path, node_version, public_address, None)
         validator_keys.append(account)
 
@@ -365,17 +368,17 @@ def create_network(
             nodes_path, public_address, "etc", "casper", "keys")
         account = generate_account_key(key_path, public_address, obj)
         generate_node(
-            bootstrap_nodes + validator_nodes,
+            initial_known_nodes,
             obj, nodes_path, node_version, public_address, None)
         zero_weight_keys.append(account)
 
     faucet_path = os.path.join(staging_path, "faucet")
     faucet_key = generate_account_key(faucet_path, "faucet", obj)
 
-    accounts_path = os.path.join(config_path, "accounts.csv")
-    # Copy accounts.csv into staging dir
-    create_accounts_csv(open(accounts_path, "w"), faucet_key,
-                        bootstrap_keys + validator_keys, zero_weight_keys)
+    accounts_path = os.path.join(config_path, "accounts.toml")
+    # Copy accounts.toml into staging dir
+    create_accounts_toml(accounts_path, faucet_key,
+                         bootstrap_keys + validator_keys, zero_weight_keys)
 
     for public_address in bootstrap_nodes + validator_nodes + zero_weight_nodes:
         node_path = os.path.join(nodes_path, public_address)
@@ -434,6 +437,8 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path
+    config["storage"]["path"] = storage_path
+    config["network"]["gossip_interval"] = 120000
     config["consensus"]["unit_hashes_folder"] = storage_path
     toml.dump(config, open(os.path.join(node_config_path, "config.toml", ), "w"))
 
@@ -455,31 +460,52 @@ def create_chainspec(template, network_name, genesis_in):
         genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
     chainspec["network"]["timestamp"] = genesis_timestamp
-    chainspec["highway"]["minimum_round_exponent"] = 16
-    #chainspec["highway"]["minimum_round_exponent"] = 12
-    chainspec["highway"]["maximum_round_exponent"] = 19
+    chainspec["highway"]["minimum_round_exponent"] = 13
+    chainspec["highway"]["maximum_round_exponent"] = 16
+    chainspec["core"]["unbonding_delay"] = 7 # normally 14
+    chainspec["core"]["auction_delay"] = 1 # normally 3
+    chainspec["core"]["era_duration"] = "15min" # normally 30min
+    chainspec["deploys"]["block_max_transfer_count"] = 500
     return chainspec
 
 
-def create_accounts_csv(output_file, faucet, validators, zero_weight_ops):
+def create_accounts_toml(accounts_path, faucet, validators, zero_weight_ops):
     """
-    :param output_file: accounts.csv
+    :param output_file: accounts.toml
     :param faucet: public key of faucet account
     :param validators: public keys of validators with weight
     :param zero_weight_ops: public keys of zero weight operators
     :return: output_file will be an appropriately formatted csv
     """
-    output_file.write("{},{},{}\n".format(faucet, 10**32, 0))
+    accounts = {"accounts": [
+        {
+            "public_key": faucet,
+            "balance": str(10**32),
+            "bonded_amount": str(0),
+        }
+    ], "delegators": []}
 
     for index, key_hex in enumerate(validators):
         motes = 10**32
         staking_weight = 10**13 + index
-        output_file.write("{},{},{}\n".format(key_hex, motes, staking_weight))
+        account = {
+            "public_key": key_hex,
+            "balance": str(motes),
+            "validator" : { "bonded_amount": str(staking_weight) },
+        }
+        accounts["accounts"].append(account)
 
     for key_hex in zero_weight_ops:
         motes = 10**32
         staking_weight = 0
-        output_file.write("{},{},{}\n".format(key_hex, motes, staking_weight))
+        account = {
+            "public_key": key_hex,
+            "balance": str(motes),
+            "bonded_amount": str(staking_weight),
+        }
+        accounts["accounts"].append(account)
+
+    toml.dump(accounts, open(accounts_path, "w"))
 
 
 def run_client(argv0, *args):

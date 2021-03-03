@@ -11,13 +11,11 @@ template_inventory = yaml.load(
 
 
 # use private ips for ansible connections
-use_private_ips = True
-
 bootstrap = 1
 # validators = 15
 validators = 75
 # zero_weight = 1
-zero_weight = 25
+zero_weight = 225
 
 instance_count = 0
 bootstrap_hosts = template_inventory["all"]["children"]["bootstrap"]["hosts"] = {
@@ -34,26 +32,20 @@ for reservation in response["Reservations"]:
 
         instance_id = instance["InstanceId"]
         public_ip_addr = instance.get("PublicIpAddress")
-        if public_ip_addr:
-            if use_private_ips:
-                ansible_host_ip = instance.get("PrivateIpAddress")
-            else:
-                ansible_host_ip = public_ip_addr
+
+        instance_state = instance['State']['Name']
+        if public_ip_addr and instance_state == "running":
             for tag in instance["Tags"]:
                 if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
-
                     if instance_count < bootstrap:
                         print(instance_count, "bootstrap", public_ip_addr)
-                        bootstrap_hosts[public_ip_addr] = {
-                            "ansible_host": ansible_host_ip}
+                        bootstrap_hosts[public_ip_addr] = ''
                     elif instance_count >= bootstrap and instance_count < bootstrap + validators:
                         print(instance_count, "validator", public_ip_addr)
-                        validator_hosts[public_ip_addr] = {
-                            "ansible_host": ansible_host_ip}
+                        validator_hosts[public_ip_addr] = ''
                     elif instance_count >= bootstrap + validators and instance_count < bootstrap + validators + zero_weight:
                         print(instance_count, "zero weight", public_ip_addr)
-                        zero_weight_hosts[public_ip_addr] = {
-                            "ansible_host": ansible_host_ip}
+                        zero_weight_hosts[public_ip_addr] = ''
 
                     instance_count += 1
 

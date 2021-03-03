@@ -1,0 +1,16 @@
+[Unit]
+Description=Netflix Vector
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/pcp/bin/pmwebd -R vector -p 8080
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=vector
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+

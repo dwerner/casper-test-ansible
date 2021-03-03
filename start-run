@@ -3,8 +3,6 @@
 set -xe
 
 ./build-chain
-./deploy "bootstrap, validators, zero_weight"
-./build-chain
 ./deploy-config-only "bootstrap, validators, zero_weight"
 ./start-service bootstrap
 sleep 3
