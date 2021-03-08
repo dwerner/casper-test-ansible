@@ -437,7 +437,6 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
     # Setup for volume operation.
     storage_path = "/storage/{}".format(public_address)
     config["storage"]["path"] = storage_path
-    config["storage"]["path"] = storage_path
     config["network"]["gossip_interval"] = 120000
     config["consensus"]["unit_hashes_folder"] = storage_path
     toml.dump(config, open(os.path.join(node_config_path, "config.toml", ), "w"))
@@ -459,7 +458,7 @@ def create_chainspec(template, network_name, genesis_in):
     show_val("Genesis timestamp", "{} (in {} seconds)".format(
         genesis_timestamp, genesis_in))
     chainspec["network"]["name"] = network_name
-    chainspec["network"]["timestamp"] = genesis_timestamp
+    chainspec["protocol"]["activation_point"] = genesis_timestamp
     chainspec["highway"]["minimum_round_exponent"] = 13
     chainspec["highway"]["maximum_round_exponent"] = 16
     chainspec["core"]["unbonding_delay"] = 7 # normally 14

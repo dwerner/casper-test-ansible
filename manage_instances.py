@@ -25,8 +25,9 @@ else:
 
 answer = input("What would you like to do? [stop/start/CANCEL]")
 if answer == "start":
-    to_start = list([name for (name, state) in instance_names.items() if state.endswith('stopped')])
-    print(f"Starting {len(to_start)} instances")
+    count = int(input(f"How many? (of {len(instance_names)} instances):"))
+    to_start = list([name for (name, state) in instance_names.items() if state.endswith('stopped')])[:count]
+    print(f"Starting {count} instances")
     ec2.start_instances(
         InstanceIds=to_start,
     )
