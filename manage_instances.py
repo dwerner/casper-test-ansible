@@ -35,6 +35,7 @@ if answer == "start":
 elif answer == "stop":
     to_stop = list([name for (name, state) in instance_names.items() if state.endswith('running')])
     print(f"Stopping {len(to_stop)} instances")
+    print(yaml.dump(to_stop))
     ec2.stop_instances(
         InstanceIds=to_stop,
     )

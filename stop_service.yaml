@@ -9,3 +9,9 @@
           name: casper-node.service
           enabled: yes
           state: stopped
+
+      - name: Stopping casper-node-heaptracked.service
+        service:
+          name: casper-node.service
+          enabled: yes
+          state: stopped

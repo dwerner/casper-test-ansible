@@ -382,7 +382,7 @@ def create_network(
 
     for public_address in bootstrap_nodes + validator_nodes + zero_weight_nodes:
         node_path = os.path.join(nodes_path, public_address)
-        show_val("coping files to ", node_path)
+        show_val("copying files to ", node_path)
 
         # copy the bin and chain into each node's versioned fileset
         node_var_lib_casper = os.path.join(node_path, "var", "lib", "casper")
@@ -421,6 +421,10 @@ def generate_node(known_addresses, obj, nodes_path, node_version, public_address
         os.path.join(node_path, "etc", "casper", node_version)
     Path(node_config_path).mkdir(parents=True, exist_ok=True)
     config = toml.load(open(obj["config_template"]))
+
+    config["rpc_server"]["qps_limit"] = \
+    config["event_stream_server"]["qps_limit"] = \
+    config["rest_server"]["qps_limit"] = 10000
 
     if trusted_hash:
         config["node"]["trusted_hash"] = trusted_hash
