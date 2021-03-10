@@ -11,7 +11,7 @@ for reservation in response["Reservations"]:
     for instance in reservation["Instances"]:
         instance_id = instance["InstanceId"]
         instance_ip_addr = instance.get("PublicIpAddress")
-        if instance_ip_addr:
+        if instance_ip_addr and instance["State"]["Name"].startswith("running"):
             for tag in instance["Tags"]:
                 if tag["Key"] == "Name" and tag["Value"].startswith("danw-test"):
                     instance_names[instance_id] = tag["Value"]

@@ -50,4 +50,4 @@ for reservation in response["Reservations"]:
                     instance_count += 1
 
 yaml.dump(template_inventory, open("generated-hosts.yaml", "w"))
-print("all done, wrote ./generated-hosts.yaml", template_inventory)
+print(f"all done, wrote ./generated-hosts.yaml bootstraps: ({len(bootstrap_hosts)}) validators: ({len(validator_hosts)}) zero-weight: ({len(zero_weight_hosts)})")

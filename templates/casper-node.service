@@ -6,6 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 # Environment="CASPER_ENABLE_LIBP2P_NET=1"
+Environment="CL_EVENT_MAX_MICROSECS=1000000"
 ExecStart=/var/lib/casper/bin/casper-node-launcher
 StandardOutput=syslog
 StandardError=syslog
