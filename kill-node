@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+# This script is useful if the disk has filled up and we need to remove /storage/<ip> for all nodes
+# use:
+#    ./describe-aws-instances | xargs ./rm-storage
+# to clear all storage dirs.
+
+set -xe
+
+for node_id in "$@"
+do
+    ssh ubuntu@$node_id "sudo pkill casper-node && sudo ps aux | grep casper-node"
+done

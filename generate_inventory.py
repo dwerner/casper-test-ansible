@@ -13,7 +13,7 @@ template_inventory = yaml.load(
 # use private ips for ansible connections
 bootstrap = 1
 # validators = 15
-validators = 75
+validators = 99
 # zero_weight = 1
 zero_weight = 225
 
